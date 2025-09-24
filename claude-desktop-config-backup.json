@@ -1,0 +1,21 @@
+{
+  "meta-ads-option1": {
+    "command": "/Users/jaredapplebaum/Desktop/Meta MCP/start-mcp.sh"
+  },
+  "meta-ads-option2": {
+    "command": "/opt/homebrew/bin/npx",
+    "args": ["ts-node", "src/mcp/server.ts"],
+    "cwd": "/Users/jaredapplebaum/Desktop/Meta MCP",
+    "env": {
+      "NODE_ENV": "production"
+    }
+  },
+  "meta-ads-option3": {
+    "command": "/opt/homebrew/bin/node",
+    "args": ["dist/mcp/server.js"],
+    "cwd": "/Users/jaredapplebaum/Desktop/Meta MCP",
+    "env": {
+      "NODE_ENV": "production"
+    }
+  }
+}

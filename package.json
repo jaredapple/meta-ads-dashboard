@@ -1,0 +1,52 @@
+{
+  "name": "meta-mcp",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "description": "Meta Marketing API to Supabase ETL pipeline with MCP server for natural language ad data queries",
+  "scripts": {
+    "build": "tsc",
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "start": "node dist/index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "format": "prettier --write src/**/*.ts",
+    "seed": "ts-node src/scripts/seed.ts",
+    "etl": "ts-node src/etl/index.ts",
+    "mcp": "ts-node src/mcp/server.ts"
+  },
+  "keywords": [
+    "meta",
+    "facebook",
+    "ads",
+    "mcp",
+    "supabase",
+    "etl",
+    "typescript"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.2.1",
+    "@types/node-cron": "^3.0.11",
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "@typescript-eslint/parser": "^8.39.0",
+    "eslint": "^9.33.0",
+    "eslint-config-prettier": "^10.1.8",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.10",
+    "prettier": "^3.6.2",
+    "ts-jest": "^29.4.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.2",
+    "@supabase/supabase-js": "^2.55.0",
+    "axios": "^1.11.0",
+    "dotenv": "^17.2.1",
+    "node-cron": "^4.2.1"
+  }
+}
