@@ -3,9 +3,10 @@ import { supabase } from '@/lib/supabase'
 
 export async function GET(
   request: Request,
-  { params }: { params: { adSetId: string } }
+  { params }: { params: Promise<{ adSetId: string }> }
 ) {
   try {
+    const resolvedParams = await params
     const { searchParams } = new URL(request.url)
     const days = parseInt(searchParams.get('days') || '7')
     
@@ -26,7 +27,7 @@ export async function GET(
         status,
         creative_id
       `)
-      .eq('ad_set_id', params.adSetId)
+      .eq('ad_set_id', resolvedParams.adSetId)
 
     if (adsError) {
       throw adsError
@@ -46,7 +47,7 @@ export async function GET(
         ctr,
         cpc
       `)
-      .eq('ad_set_id', params.adSetId)
+      .eq('ad_set_id', resolvedParams.adSetId)
       .gte('date_start', dateStart)
       .lte('date_start', dateEnd)
 
@@ -124,7 +125,7 @@ export async function GET(
 
     return NextResponse.json({
       ads: enrichedAds,
-      adset_id: params.adSetId,
+      adset_id: resolvedParams.adSetId,
       total_ads: enrichedAds.length
     })
   } catch (error) {

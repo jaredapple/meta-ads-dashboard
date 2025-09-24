@@ -8,7 +8,7 @@ const execAsync = promisify(exec)
 // Simple in-memory queue to prevent concurrent syncs
 let isSyncing = false
 let lastSyncTime: Date | null = null
-let syncQueue: string[] = []
+const syncQueue: string[] = []
 
 export async function POST(request: NextRequest) {
   try {

@@ -322,7 +322,7 @@ export function AccountManagement() {
 
       {accounts.length === 0 && !showAddForm && (
         <p className="text-center text-gray-500 py-8">
-          No accounts configured. Click "Add Account" to get started.
+          No accounts configured. Click &ldquo;Add Account&rdquo; to get started.
         </p>
       )}
     </div>

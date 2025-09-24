@@ -3,9 +3,10 @@ import { supabase } from '@/lib/supabase'
 
 export async function GET(
   request: Request,
-  { params }: { params: { campaignId: string } }
+  { params }: { params: Promise<{ campaignId: string }> }
 ) {
   try {
+    const resolvedParams = await params
     const { searchParams } = new URL(request.url)
     const days = parseInt(searchParams.get('days') || '7')
     
@@ -27,7 +28,7 @@ export async function GET(
         daily_budget,
         lifetime_budget
       `)
-      .eq('campaign_id', params.campaignId)
+      .eq('campaign_id', resolvedParams.campaignId)
 
     if (adSetsError) {
       throw adSetsError
@@ -46,7 +47,7 @@ export async function GET(
         ctr,
         cpc
       `)
-      .eq('campaign_id', params.campaignId)
+      .eq('campaign_id', resolvedParams.campaignId)
       .gte('date_start', dateStart)
       .lte('date_start', dateEnd)
 
@@ -59,7 +60,7 @@ export async function GET(
       .from('ads')
       .select('ad_set_id')
       .eq('status', 'ACTIVE')
-      .eq('campaign_id', params.campaignId)
+      .eq('campaign_id', resolvedParams.campaignId)
 
     if (adCountsError) {
       console.warn('Failed to get ad counts:', adCountsError)
@@ -133,7 +134,7 @@ export async function GET(
 
     return NextResponse.json({
       adsets: enrichedAdSets,
-      campaign_id: params.campaignId,
+      campaign_id: resolvedParams.campaignId,
       total_adsets: enrichedAdSets.length
     })
   } catch (error) {
