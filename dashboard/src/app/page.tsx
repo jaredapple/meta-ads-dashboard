@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { DailyPerformanceChart } from '@/components/dashboard/daily-performance-chart'
 import { DateRangePicker } from '@/components/dashboard/date-range-picker'
-import { CampaignPerformanceChart } from '@/components/dashboard/campaign-performance-chart'
+// import { CampaignPerformanceChart } from '@/components/dashboard/campaign-performance-chart' // Temporarily disabled
 import { CampaignDrillDown } from '@/components/dashboard/campaign-drill-down'
 import { PerformanceComparison } from '@/components/dashboard/performance-comparison'
 import { TopBottomPerformers } from '@/components/dashboard/top-bottom-performers'
@@ -389,14 +389,14 @@ export default function Dashboard() {
           <PerformanceComparison currentDays={dateRange} />
         </div>
 
-        {/* Campaign Performance Chart */}
-        <div className="mb-8">
+        {/* Campaign Performance Chart - Temporarily hidden for improvements */}
+        {/* <div className="mb-8">
           <CampaignPerformanceChart 
             campaigns={campaigns.campaigns} 
             loading={loading}
             onCampaignClick={handleCampaignClick}
           />
-        </div>
+        </div> */}
 
         {/* Top/Bottom Performers */}
         <div className="mb-8">
