@@ -98,7 +98,8 @@ class StandardizedETLService {
     } catch (error) {
       console.error(`❌ Error syncing ${account.client_name}:`, error.message);
       await this.updateSyncStatus(account.id, 'failed');
-      throw error;
+      // Don't throw, just log and continue
+      return false;
     }
   }
 
@@ -254,12 +255,14 @@ class StandardizedETLService {
 
   async syncInsightsData(account, daysBack = 3) {
     console.log(`  📊 Syncing insights data for ${account.client_name}`);
-    
-    // Get last N days of data (default 3 for near real-time updates)
-    const endDate = new Date();
-    const startDate = new Date();
+
+    // Get current date in account's timezone
+    const timezone = account.timezone || 'America/Los_Angeles';
+    const nowInTZ = new Date().toLocaleString("en-US", {timeZone: timezone});
+    const endDate = new Date(nowInTZ);
+    const startDate = new Date(nowInTZ);
     startDate.setDate(startDate.getDate() - daysBack);
-    
+
     const dateStart = startDate.toISOString().split('T')[0];
     const dateEnd = endDate.toISOString().split('T')[0];
     
@@ -294,13 +297,15 @@ class StandardizedETLService {
 
   async syncIndividualInsights(account, daysBack = 3) {
     console.log(`  🎯 Syncing individual-level insights for ${account.client_name}`);
-    
+
     try {
-      // First, clear out any existing account-level aggregated data for this date range
-      const endDate = new Date();
-      const startDate = new Date();
+      // Get current date in account's timezone
+      const timezone = account.timezone || 'America/Los_Angeles';
+      const nowInTZ = new Date().toLocaleString("en-US", {timeZone: timezone});
+      const endDate = new Date(nowInTZ);
+      const startDate = new Date(nowInTZ);
       startDate.setDate(startDate.getDate() - daysBack);
-      
+
       const dateStart = startDate.toISOString().split('T')[0];
       const dateEnd = endDate.toISOString().split('T')[0];
       
@@ -331,11 +336,14 @@ class StandardizedETLService {
 
   async syncCampaignInsights(account, daysBack = 3) {
     console.log(`  🎯 Syncing campaign-level insights for ${account.client_name}`);
-    
-    const endDate = new Date();
-    const startDate = new Date();
+
+    // Get current date in account's timezone
+    const timezone = account.timezone || 'America/Los_Angeles';
+    const nowInTZ = new Date().toLocaleString("en-US", {timeZone: timezone});
+    const endDate = new Date(nowInTZ);
+    const startDate = new Date(nowInTZ);
     startDate.setDate(startDate.getDate() - daysBack);
-    
+
     const dateStart = startDate.toISOString().split('T')[0];
     const dateEnd = endDate.toISOString().split('T')[0];
     
@@ -373,11 +381,14 @@ class StandardizedETLService {
 
   async syncAdInsights(account, daysBack = 3) {
     console.log(`  📢 Syncing ad-level insights for ${account.client_name}`);
-    
-    const endDate = new Date();
-    const startDate = new Date();
+
+    // Get current date in account's timezone
+    const timezone = account.timezone || 'America/Los_Angeles';
+    const nowInTZ = new Date().toLocaleString("en-US", {timeZone: timezone});
+    const endDate = new Date(nowInTZ);
+    const startDate = new Date(nowInTZ);
     startDate.setDate(startDate.getDate() - daysBack);
-    
+
     const dateStart = startDate.toISOString().split('T')[0];
     const dateEnd = endDate.toISOString().split('T')[0];
     
@@ -900,21 +911,43 @@ class StandardizedETLService {
 
   async syncAllAccounts(daysBack = 3) {
     console.log('🚀 Starting standardized ETL sync for all active accounts\n');
-    
+
     try {
       const accounts = await this.getActiveAccounts();
       console.log(`Found ${accounts.length} active accounts to sync`);
 
+      const syncResults = [];
       for (const account of accounts) {
-        await this.syncAccount(account, daysBack);
-        
+        try {
+          await this.syncAccount(account, daysBack);
+          syncResults.push({ account: account.client_name, status: 'success' });
+        } catch (accountError) {
+          console.error(`❌ Failed to sync ${account.client_name}:`, accountError.message);
+          syncResults.push({ account: account.client_name, status: 'failed', error: accountError.message });
+          // Continue with next account instead of stopping
+        }
+
         // Wait between accounts to respect rate limits
-        console.log('⏳ Waiting 3 seconds before next account...\n');
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        if (accounts.indexOf(account) < accounts.length - 1) {
+          console.log('⏳ Waiting 3 seconds before next account...\n');
+          await new Promise(resolve => setTimeout(resolve, 3000));
+        }
       }
 
-      console.log('🎉 Standardized ETL sync completed for all accounts');
-      
+      // Log summary
+      console.log('\n📊 Sync Results:');
+      syncResults.forEach(result => {
+        const icon = result.status === 'success' ? '✅' : '❌';
+        console.log(`  ${icon} ${result.account}: ${result.status}${result.error ? ` (${result.error})` : ''}`);
+      });
+
+      const successCount = syncResults.filter(r => r.status === 'success').length;
+      if (successCount > 0) {
+        console.log(`\n🎉 Successfully synced ${successCount}/${accounts.length} accounts`);
+      } else {
+        console.log('\n⚠️  No accounts were successfully synced');
+      }
+
       // Generate summary report
       await this.generateSyncReport();
 
