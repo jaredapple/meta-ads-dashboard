@@ -48,9 +48,9 @@ export async function POST(request: NextRequest) {
     lastSyncTime = new Date()
     
     try {
-      // Change to project root directory (two levels up from dashboard/src/app/api/sync)
-      const projectRoot = path.resolve(process.cwd(), '../../..')
-      
+      // Since this runs from the dashboard directory on Render, go up one level to project root
+      const projectRoot = path.resolve(process.cwd(), '..')
+
       // Execute the ETL sync script with specified days
       const command = `cd "${projectRoot}" && node run-standardized-etl.js --days ${days}`
       
